@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ReportIssuePage() {
@@ -13,6 +13,29 @@ export default function ReportIssuePage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+        
+        if (!data.authenticated) {
+          router.push("/login");
+          return;
+        }
+        
+        setAuthenticated(true);
+      } catch (err) {
+        console.error("Auth check error:", err);
+        router.push("/login");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -62,6 +85,12 @@ export default function ReportIssuePage() {
   };
 
   return (
+    <>
+      {authenticated === null ? (
+        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      ) : (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
         <div className="mb-8">
@@ -168,8 +197,9 @@ export default function ReportIssuePage() {
         <p className="text-xs text-gray-500 text-center mt-6">
           Your issue will be reviewed by city officials. You'll receive updates on its status.
         </p>
-        </div>
       </div>
     </div>
+      )}
+    </>
   );
 }
