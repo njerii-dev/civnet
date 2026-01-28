@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { verifyAuth } from "@/lib/auth";
-
-const prisma = new PrismaClient();
 
 export async function POST(
   request: NextRequest,
@@ -69,8 +67,6 @@ export async function POST(
       { error: "Failed to add comment" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 

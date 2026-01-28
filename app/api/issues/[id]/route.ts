@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { verifyAuth } from "@/lib/auth";
-
-const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
@@ -65,8 +63,6 @@ export async function GET(
       { error: "Failed to fetch issue" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -164,7 +160,5 @@ export async function PUT(
       { error: "Failed to update issue" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

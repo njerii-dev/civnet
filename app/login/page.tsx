@@ -57,42 +57,47 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+        <div className="text-center">
+          <div className="text-5xl mb-4">🔐</div>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Welcome Back
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Report and track community issues
+          <p className="mt-2 text-gray-600 text-sm">
+            Sign in to access your community platform
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          )}
+        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            {error && (
+              <div className="rounded-lg bg-red-50 border border-red-200 p-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">⚠️</span>
+                  <p className="text-sm text-red-700 font-medium">{error}</p>
+                </div>
+              </div>
+            )}
 
-          <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
+                Email Address
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+                placeholder="you@example.com"
                 value={formData.email}
                 onChange={handleChange}
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-900 mb-2">
                 Password
               </label>
               <input
@@ -100,33 +105,44 @@ export default function LoginPage() {
                 name="password"
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+                placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
               />
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="inline-block animate-spin">⚙️</span>
+                  Signing in...
+                </span>
+              ) : (
+                "Sign In"
+              )}
             </button>
-          </div>
+          </form>
 
-          <div className="text-center">
+          <div className="mt-6 text-center border-t pt-6">
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
-              <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-                Sign up
+              <Link href="/signup" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
+                Create one
               </Link>
             </p>
           </div>
-        </form>
+        </div>
+
+        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 text-center">
+          <p className="text-xs text-blue-700">
+            💡 Demo: Test with any email and password to create an account first
+          </p>
+        </div>
       </div>
     </div>
   );
