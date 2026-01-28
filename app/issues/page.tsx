@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import IssueCard from "@/components/IssueCard";
 
 interface Issue {
   id: string;
@@ -66,24 +67,6 @@ export default function IssuesPage() {
     checkAuth();
   }, [router]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "SUBMITTED":
-        return "bg-yellow-100 text-yellow-800";
-      case "IN_PROGRESS":
-        return "bg-blue-100 text-blue-800";
-      case "RESOLVED":
-        return "bg-green-100 text-green-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -92,95 +75,108 @@ export default function IssuesPage() {
     );
   }
 
+  const getStatusStats = () => {
+    return {
+      total: issues.length,
+      submitted: issues.filter((i) => i.status === "SUBMITTED").length,
+      inProgress: issues.filter((i) => i.status === "IN_PROGRESS").length,
+      resolved: issues.filter((i) => i.status === "RESOLVED").length,
+    };
+  };
+
+  const stats = getStatusStats();
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Civnet</h1>
-          <div className="flex gap-4 items-center">
-            <span className="text-sm text-gray-600">{user?.email}</span>
-            {user?.role === "ADMIN" && (
-              <Link
-                href="/admin/dashboard"
-                className="px-3 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Admin Dashboard
-              </Link>
-            )}
-            <button
-              onClick={handleLogout}
-              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+    <div className="min-h-screen bg-gray-50 pt-16 md:pt-0">
+      {/* Header Section */}
+      <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Dashboard - Reported Issues</h1>
+              <p className="text-blue-100">Track all community issues and their status</p>
+            </div>
+            <Link
+              href="/issues/report"
+              className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow-md hover:shadow-lg"
             >
-              Logout
-            </button>
+              + Report New Issue
+            </Link>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900">Reported Issues</h2>
-            <p className="text-gray-600 mt-1">{issues.length} issues in total</p>
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-lg shadow p-6 border-t-4 border-t-blue-500">
+            <p className="text-gray-600 text-sm font-medium">Total Issues</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total}</p>
           </div>
-          <Link
-            href="/issues/report"
-            className="px-6 py-3 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors shadow-md hover:shadow-lg whitespace-nowrap"
-          >
-            + Report New Issue
-          </Link>
+          <div className="bg-white rounded-lg shadow p-6 border-t-4 border-t-yellow-500">
+            <p className="text-gray-600 text-sm font-medium">Submitted</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.submitted}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6 border-t-4 border-t-blue-400">
+            <p className="text-gray-600 text-sm font-medium">In Progress</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.inProgress}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6 border-t-4 border-t-green-500">
+            <p className="text-gray-600 text-sm font-medium">Resolved</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.resolved}</p>
+          </div>
         </div>
 
-        {error && (
-          <div className="mb-4 rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
-        )}
+        {/* Title and Error Section */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">All Issues</h2>
+          {error && (
+            <div className="rounded-lg bg-red-50 border border-red-200 p-4 mb-4">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
+        </div>
 
+        {/* Issues Grid */}
         {issues.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 mb-4">No issues reported yet</p>
+          <div className="text-center py-16 bg-white rounded-lg shadow">
+            <p className="text-gray-600 mb-4 text-lg">No issues reported yet</p>
             <Link
               href="/issues/report"
-              className="text-blue-600 hover:text-blue-800"
+              className="text-blue-600 hover:text-blue-800 font-semibold"
             >
               Be the first to report an issue
             </Link>
           </div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {issues.map((issue) => (
-              <Link key={issue.id} href={`/issues/${issue.id}`}>
-                <div className="bg-white rounded-lg shadow hover:shadow-lg transition-all duration-200 cursor-pointer p-6 border-l-4 border-l-blue-500 hover:border-l-blue-600">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
-                        {issue.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        Category: <span className="font-medium">{issue.category}</span>
-                      </p>
-                    </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ml-2 ${getStatusColor(
-                        issue.status
-                      )}`}
-                    >
-                      {issue.status}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-700 mb-4 line-clamp-2">
-                    {issue.description}
-                  </p>
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>📍 By: {issue.citizen.name}</span>
-                    <span>📅 {new Date(issue.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </div>
-              </Link>
+              <IssueCard key={issue.id} issue={issue} />
             ))}
+          </div>
+        )}
+
+        {/* Admin Section (if user is admin) */}
+        {user?.role === "ADMIN" && (
+          <div className="mt-12 pt-8 border-t-2 border-gray-200">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Admin View</h3>
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <p className="text-gray-600 font-medium mb-2">Administrative Controls</p>
+                  <p className="text-sm text-gray-500">
+                    Access advanced features to manage issues, view analytics, and configure system settings.
+                  </p>
+                </div>
+                <Link
+                  href="/admin/dashboard"
+                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg whitespace-nowrap"
+                >
+                  Go to Admin Dashboard
+                </Link>
+              </div>
+            </div>
           </div>
         )}
       </main>
