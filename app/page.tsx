@@ -62,23 +62,72 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Report Issues</h3>
+          <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+            <div className="text-4xl mb-3">📝</div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Easy Reporting</h3>
             <p className="text-gray-600">
-              Easily report community problems like potholes, broken lights, and waste issues.
+              Submit issues in seconds with title, description, category and details.
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Track Progress</h3>
+          <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+            <div className="text-4xl mb-3">📊</div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Real-time Tracking</h3>
             <p className="text-gray-600">
-              Monitor the status of reported issues and receive updates from local authorities.
+              Monitor status updates and get notifications when issues are being addressed.
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Collaborate</h3>
+          <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+            <div className="text-4xl mb-3">🤝</div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Community Power</h3>
             <p className="text-gray-600">
-              Connect with your community and city officials to improve your neighborhood.
+              Vote on issues and collaborate with neighbors to amplify important problems.
             </p>
+          </div>
+        </div>
+
+        {/* Statistics Section */}
+        <div className="mt-16 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg p-8 text-white">
+          <h2 className="text-3xl font-bold text-center mb-8">Impact So Far</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <p className="text-4xl font-bold">127+</p>
+              <p className="text-blue-100 mt-2">Issues Reported</p>
+            </div>
+            <div className="text-center">
+              <p className="text-4xl font-bold">84%</p>
+              <p className="text-blue-100 mt-2">Resolution Rate</p>
+            </div>
+            <div className="text-center">
+              <p className="text-4xl font-bold">2,300+</p>
+              <p className="text-blue-100 mt-2">Active Citizens</p>
+            </div>
+            <div className="text-center">
+              <p className="text-4xl font-bold">15</p>
+              <p className="text-blue-100 mt-2">Issues This Week</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Features */}
+        <div className="mt-16">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Key Features</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 hover:border-blue-400 transition-colors">
+              <p className="text-2xl mb-2">⚡</p>
+              <p className="font-medium text-gray-900">Instant Reporting</p>
+            </div>
+            <div className="p-4 bg-green-50 rounded-lg border border-green-200 hover:border-green-400 transition-colors">
+              <p className="text-2xl mb-2">📲</p>
+              <p className="font-medium text-gray-900">Mobile Ready</p>
+            </div>
+            <div className="p-4 bg-purple-50 rounded-lg border border-purple-200 hover:border-purple-400 transition-colors">
+              <p className="text-2xl mb-2">🔔</p>
+              <p className="font-medium text-gray-900">Live Updates</p>
+            </div>
+            <div className="p-4 bg-orange-50 rounded-lg border border-orange-200 hover:border-orange-400 transition-colors">
+              <p className="text-2xl mb-2">🛡️</p>
+              <p className="font-medium text-gray-900">Secure & Safe</p>
+            </div>
           </div>
         </div>
       </main>
