@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // We removed the url line from here
+}
+
+model Issue {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  category    String
+  status      String   @default("Submitted")
+  createdAt   DateTime @default(now())
+}
