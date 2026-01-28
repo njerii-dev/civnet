@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import Sidebar from "@/components/Sidebar";
 
 interface Issue {
   id: string;
@@ -17,13 +17,17 @@ interface Issue {
   };
 }
 
-export default function AdminDashboardPage() {
+export default function AdminDashboard() {
   const router = useRouter();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [user, setUser] = useState<any>(null);
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
+  const [comment, setComment] = useState("");
 
   useEffect(() => {
     const checkAuthAndFetchIssues = async () => {
@@ -32,32 +36,18 @@ export default function AdminDashboardPage() {
         const authData = await authRes.json();
 
         if (!authData.authenticated || authData.user.role !== "ADMIN") {
-          router.push("/login");
+          router.push("/dashboard");
           return;
         }
 
         setUser(authData.user);
-        fetchIssues();
-      } catch (err) {
-        console.error("Auth check error:", err);
-        router.push("/login");
-      }
-    };
-
-    const fetchIssues = async () => {
-      try {
+        
         const res = await fetch("/api/issues");
         const data = await res.json();
-
-        if (!res.ok) {
-          setError("Failed to fetch issues");
-          return;
-        }
-
         setIssues(data);
       } catch (err) {
-        console.error("Fetch issues error:", err);
-        setError("An error occurred");
+        console.error("Error:", err);
+        router.push("/dashboard");
       } finally {
         setLoading(false);
       }
@@ -66,194 +56,243 @@ export default function AdminDashboardPage() {
     checkAuthAndFetchIssues();
   }, [router]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "SUBMITTED":
-        return "bg-yellow-100 text-yellow-800";
-      case "IN_PROGRESS":
-        return "bg-blue-100 text-blue-800";
-      case "RESOLVED":
-        return "bg-green-100 text-green-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  // Get filtered issues
+  let filteredIssues = issues;
+  if (filterStatus !== "ALL") {
+    filteredIssues = issues.filter(issue => issue.status === filterStatus);
+  }
+
+  const handleStatusChange = async () => {
+    if (!selectedIssue || !newStatus) return;
+    
+    try {
+      const response = await fetch(`/api/issues/${selectedIssue.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        setIssues(issues.map(issue => 
+          issue.id === selectedIssue.id 
+            ? { ...issue, status: newStatus }
+            : issue
+        ));
+        setShowStatusModal(false);
+        setNewStatus("");
+        setSelectedIssue(null);
+      }
+    } catch (err) {
+      console.error("Error updating status:", err);
     }
   };
 
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-  };
+  const handleAddComment = async () => {
+    if (!selectedIssue || !comment) return;
+    
+    try {
+      const response = await fetch(`/api/issues/${selectedIssue.id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: comment }),
+      });
 
-  const filteredIssues = filterStatus === "ALL"
-    ? issues
-    : issues.filter(issue => issue.status === filterStatus);
-
-  const stats = {
-    total: issues.length,
-    submitted: issues.filter(i => i.status === "SUBMITTED").length,
-    inProgress: issues.filter(i => i.status === "IN_PROGRESS").length,
-    resolved: issues.filter(i => i.status === "RESOLVED").length,
+      if (response.ok) {
+        setShowCommentModal(false);
+        setComment("");
+        setSelectedIssue(null);
+      }
+    } catch (err) {
+      console.error("Error adding comment:", err);
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <p className="text-gray-600">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <div className="flex gap-4 items-center">
-            <span className="text-sm text-gray-600">{user?.email}</span>
-            <Link
-              href="/issues"
-              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
-            >
-              View Issues
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
-            >
-              Logout
-            </button>
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar user={user} />
+      
+      <main className="flex-1 md:ml-0">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 p-6 md:p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">Admin View - All Issues</h1>
+            <span className="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-medium">
+              {filteredIssues.length} issues
+            </span>
           </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        {error && (
-          <div className="mb-6 rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
-        )}
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-md p-6 border-l-4 border-l-gray-600">
-            <p className="text-gray-600 text-sm font-semibold mb-1">📊 Total Issues</p>
-            <p className="text-4xl font-bold text-gray-900">{stats.total}</p>
-          </div>
-          <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg shadow-md p-6 border-l-4 border-l-yellow-600">
-            <p className="text-yellow-700 text-sm font-semibold mb-1">🔔 Submitted</p>
-            <p className="text-4xl font-bold text-yellow-600">{stats.submitted}</p>
-          </div>
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-md p-6 border-l-4 border-l-blue-600">
-            <p className="text-blue-700 text-sm font-semibold mb-1">⚙️ In Progress</p>
-            <p className="text-4xl font-bold text-blue-600">{stats.inProgress}</p>
-          </div>
-          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-md p-6 border-l-4 border-l-green-600">
-            <p className="text-green-700 text-sm font-semibold mb-1">✅ Resolved</p>
-            <p className="text-4xl font-bold text-green-600">{stats.resolved}</p>
-          </div>
-        </div>
-
-        {/* Filter */}
-        <div className="mb-8">
-          <label className="block text-sm font-semibold text-gray-900 mb-3">
-            🔍 Filter by Status
-          </label>
-          <div className="flex gap-2 flex-wrap">
-            {["ALL", "SUBMITTED", "IN_PROGRESS", "RESOLVED"].map((status) => (
+          
+          {/* Filter Tabs */}
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {["ALL", "SUBMITTED", "IN_PROGRESS", "RESOLVED"].map(status => (
               <button
                 key={status}
                 onClick={() => setFilterStatus(status)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
                   filterStatus === status
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "bg-white text-gray-700 border border-gray-300 hover:border-blue-500"
+                    ? "bg-purple-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                {status === "ALL" && "All Issues"}
-                {status === "SUBMITTED" && "🔔 Submitted"}
-                {status === "IN_PROGRESS" && "⚙️ In Progress"}
-                {status === "RESOLVED" && "✅ Resolved"}
+                {status}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Issues Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          {filteredIssues.length === 0 ? (
-            <div className="p-6 text-center">
-              <p className="text-gray-600">
-                {filterStatus === "ALL"
-                  ? "No issues yet"
-                  : `No ${filterStatus.toLowerCase()} issues`}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b">
+        {/* Table */}
+        <div className="p-6 md:p-8">
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Title</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
+                  <th className="hidden md:table-cell px-6 py-4 text-left text-sm font-semibold text-gray-700">Reported By</th>
+                  <th className="hidden md:table-cell px-6 py-4 text-left text-sm font-semibold text-gray-700">Last Updated</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredIssues.length === 0 ? (
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Title
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Reporter
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Category
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Action
-                    </th>
+                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                      No issues found
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {filteredIssues.map((issue) => (
-                    <tr key={issue.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900 max-w-xs truncate">
-                        {issue.title}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {issue.citizen.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {issue.category}
+                ) : (
+                  filteredIssues.map(issue => (
+                    <tr key={issue.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="font-medium text-gray-900">{issue.title}</p>
+                          <p className="text-sm text-gray-600">{issue.category}</p>
+                        </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
-                            issue.status
-                          )}`}
-                        >
-                          {issue.status}
-                        </span>
+                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+                          issue.status === "SUBMITTED" ? "bg-yellow-100 text-yellow-800" :
+                          issue.status === "IN_PROGRESS" ? "bg-blue-100 text-blue-800" :
+                          "bg-green-100 text-green-800"
+                        }`}>
+                          {issue.status === "SUBMITTED" && "📋"}
+                          {issue.status === "IN_PROGRESS" && "⚙️"}
+                          {issue.status === "RESOLVED" && "✅"}
+                          <span>{issue.status}</span>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="hidden md:table-cell px-6 py-4 text-sm text-gray-600">
+                        {issue.citizen.name}
+                      </td>
+                      <td className="hidden md:table-cell px-6 py-4 text-sm text-gray-600">
                         {new Date(issue.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 text-sm">
-                        <Link
-                          href={`/issues/${issue.id}`}
-                          className="text-blue-600 hover:text-blue-800 font-medium"
+                      <td className="px-6 py-4 text-right space-x-2">
+                        <button
+                          onClick={() => {
+                            setSelectedIssue(issue);
+                            setNewStatus(issue.status);
+                            setShowStatusModal(true);
+                          }}
+                          className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm font-medium hover:bg-blue-200 transition-colors"
                         >
-                          Manage
-                        </Link>
+                          Status
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedIssue(issue);
+                            setShowCommentModal(true);
+                          }}
+                          className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded text-sm font-medium hover:bg-yellow-200 transition-colors"
+                        >
+                          Comment
+                        </button>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        {/* Status Modal */}
+        {showStatusModal && selectedIssue && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-md w-full p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Change Status</h2>
+              <p className="text-sm text-gray-600 mb-4">{selectedIssue.title}</p>
+              
+              <select
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4"
+              >
+                <option value="SUBMITTED">📋 Submitted</option>
+                <option value="IN_PROGRESS">⚙️ In Progress</option>
+                <option value="RESOLVED">✅ Resolved</option>
+              </select>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setShowStatusModal(false)}
+                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleStatusChange}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Update
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Comment Modal */}
+        {showCommentModal && selectedIssue && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-md w-full p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Add Comment</h2>
+              <p className="text-sm text-gray-600 mb-4">{selectedIssue.title}</p>
+              
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Add an update or comment..."
+                rows={4}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 resize-none"
+              />
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    setShowCommentModal(false);
+                    setComment("");
+                  }}
+                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddComment}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  Post Comment
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

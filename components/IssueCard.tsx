@@ -18,9 +18,11 @@ interface Issue {
 interface IssueCardProps {
   issue: Issue;
   isAdmin?: boolean;
+  onStatusClick?: (issueId: string) => void;
+  onCommentClick?: (issueId: string) => void;
 }
 
-export default function IssueCard({ issue, isAdmin = false }: IssueCardProps) {
+export default function IssueCard({ issue, isAdmin = false, onStatusClick, onCommentClick }: IssueCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "SUBMITTED":
@@ -59,43 +61,54 @@ export default function IssueCard({ issue, isAdmin = false }: IssueCardProps) {
   };
 
   const colors = getStatusColor(issue.status);
-  const daysSinceCreated = Math.floor(
-    (Date.now() - new Date(issue.createdAt).getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const createdDate = new Date(issue.createdAt);
+  const formattedDate = createdDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
 
   return (
-    <Link href={`/issues/${issue.id}`}>
-      <div
-        className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer p-5 border-l-4 hover:scale-105`}
-        style={{ borderLeftColor: colors.text.replace("text-", "").split("-")[0] === "yellow" ? "#f59e0b" : colors.text.replace("text-", "").split("-")[0] === "blue" ? "#3b82f6" : "#10b981" }}
-      >
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">{getCategoryIcon(issue.category)}</span>
-              <h3 className="text-lg font-semibold text-gray-900 truncate">
-                {issue.title}
-              </h3>
+    <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+      <td className="px-6 py-4">
+        <Link href={`/issues/${issue.id}`}>
+          <div className="flex items-start gap-3">
+            <span className="text-xl">{getCategoryIcon(issue.category)}</span>
+            <div>
+              <p className="font-medium text-gray-900 hover:text-blue-600">{issue.title}</p>
+              <p className="text-sm text-gray-600">{issue.category}</p>
             </div>
-            <p className="text-sm text-gray-600">
-              {issue.category}
-            </p>
           </div>
-          <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${colors.bg} ${colors.text}`}>
-            <span>{getStatusIcon(issue.status)}</span>
-            <span>{issue.status}</span>
-          </div>
+        </Link>
+      </td>
+      <td className="px-6 py-4">
+        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${colors.bg} ${colors.text}`}>
+          <span>{getStatusIcon(issue.status)}</span>
+          <span>{issue.status}</span>
         </div>
-
-        <p className="text-sm text-gray-700 mb-4 line-clamp-2 leading-relaxed">
-          {issue.description}
-        </p>
-
-        <div className="flex justify-between items-center text-xs text-gray-500 pt-3 border-t border-gray-100">
-          <span>📍 {issue.citizen.name}</span>
-          <span>📅 {daysSinceCreated === 0 ? "Today" : daysSinceCreated === 1 ? "Yesterday" : `${daysSinceCreated} days ago`}</span>
-        </div>
-      </div>
-    </Link>
+      </td>
+      <td className="px-6 py-4 text-sm text-gray-600">
+        {issue.status}
+      </td>
+      <td className="px-6 py-4 text-sm text-gray-600">
+        {formattedDate}
+      </td>
+      {isAdmin && (
+        <td className="px-6 py-4 text-right space-x-2">
+          <button
+            onClick={() => onStatusClick?.(issue.id)}
+            className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm font-medium hover:bg-blue-200 transition-colors"
+          >
+            Change Status
+          </button>
+          <button
+            onClick={() => onCommentClick?.(issue.id)}
+            className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded text-sm font-medium hover:bg-yellow-200 transition-colors"
+          >
+            Add Comment
+          </button>
+        </td>
+      )}
+    </tr>
   );
 }
