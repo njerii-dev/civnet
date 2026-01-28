@@ -4,14 +4,92 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // We removed the url line from here
+  url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  CITIZEN
+  ADMIN
+}
+
+enum IssueStatus {
+  SUBMITTED
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum IssueCategory {
+  ROADS
+  LIGHTING
+  WASTE
+  OTHER
+}
+
+// User model for authentication and account management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // Should be hashed
+  name      String
+  role      UserRole @default(CITIZEN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  issues           Issue[]
+  comments         IssueComment[]
+  respondedIssues  Issue[]         @relation("AdminResponses")
+  
+  @@map("users")
+}
+
+// Issue model for reported community issues
 model Issue {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   title       String
   description String
-  category    String
-  status      String   @default("Submitted")
-  createdAt   DateTime @default(now())
+  category    IssueCategory
+  status      IssueStatus   @default(SUBMITTED)
+  
+  // Foreign key to user who reported the issue
+  citizenId   String
+  citizen     User          @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+  
+  // Admin response
+  adminResponse String?
+  respondedById String?
+  respondedBy    User?      @relation("AdminResponses", fields: [respondedById], references: [id], onDelete: SetNull)
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  resolvedAt  DateTime?
+  
+  // Relations
+  comments    IssueComment[]
+  
+  @@index([citizenId])
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+  @@map("issues")
 }
+
+// Comments model for admin responses and updates
+model IssueComment {
+  id        String   @id @default(cuid())
+  content   String
+  
+  issueId   String
+  issue     Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([issueId])
+  @@index([authorId])
+  @@map("issue_comments")
+}
+
