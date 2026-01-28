@@ -62,83 +62,113 @@ export default function ReportIssuePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Report an Issue</h1>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Report an Issue</h1>
+          <p className="text-gray-600">Help improve our community by reporting local issues</p>
+        </div>
 
-        {success && (
-          <div className="mb-4 rounded-md bg-green-50 p-4">
-            <p className="text-sm text-green-700">
-              ✓ Issue submitted successfully! Redirecting...
-            </p>
-          </div>
-        )}
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          {success && (
+            <div className="mb-6 rounded-lg bg-green-50 border border-green-200 p-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">✓</span>
+                <div>
+                  <p className="font-semibold text-green-800">Issue submitted successfully!</p>
+                  <p className="text-sm text-green-700">Redirecting to your issue...</p>
+                </div>
+              </div>
+            </div>
+          )}
 
-        {error && (
-          <div className="mb-4 rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
-        )}
+          {error && (
+            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">⚠</span>
+                <div>
+                  <p className="font-semibold text-red-800">Error</p>
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-              Issue Title
-            </label>
-            <input
-              id="title"
-              name="title"
-              type="text"
-              required
-              placeholder="e.g., Pothole on Main Street"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={formData.title}
-              onChange={handleChange}
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="title" className="block text-sm font-semibold text-gray-900 mb-2">
+                Issue Title *
+              </label>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                required
+                placeholder="e.g., Pothole on Main Street"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                value={formData.title}
+                onChange={handleChange}
+                maxLength={100}
+              />
+              <p className="text-xs text-gray-500 mt-1">{formData.title.length}/100</p>
+            </div>
 
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-              Category
-            </label>
-            <select
-              id="category"
-              name="category"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={formData.category}
-              onChange={handleChange}
+            <div>
+              <label htmlFor="category" className="block text-sm font-semibold text-gray-900 mb-2">
+                Category *
+              </label>
+              <select
+                id="category"
+                name="category"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+                value={formData.category}
+                onChange={handleChange}
+              >
+                <option value="ROADS">🛣️ Roads & Potholes</option>
+                <option value="LIGHTING">💡 Street Lighting</option>
+                <option value="WASTE">♻️ Waste & Garbage</option>
+                <option value="OTHER">📋 Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="description" className="block text-sm font-semibold text-gray-900 mb-2">
+                Description *
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                required
+                rows={5}
+                placeholder="Please provide details about the issue... (location, what's wrong, urgency level, etc.)"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+                value={formData.description}
+                onChange={handleChange}
+                maxLength={500}
+              />
+              <p className="text-xs text-gray-500 mt-1">{formData.description.length}/500</p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || !formData.title.trim() || !formData.description.trim()}
+              className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
             >
-              <option value="ROADS">Roads & Potholes</option>
-              <option value="LIGHTING">Street Lighting</option>
-              <option value="WASTE">Waste & Garbage</option>
-              <option value="OTHER">Other</option>
-            </select>
-          </div>
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="inline-block animate-spin">⚙️</span>
+                  Submitting...
+                </span>
+              ) : (
+                "Submit Issue"
+              )}
+            </button>
+          </form>
 
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              required
-              rows={4}
-              placeholder="Please provide details about the issue..."
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={formData.description}
-              onChange={handleChange}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {loading ? "Submitting..." : "Submit Issue"}
-          </button>
-        </form>
+        <p className="text-xs text-gray-500 text-center mt-6">
+          Your issue will be reviewed by city officials. You'll receive updates on its status.
+        </p>
+        </div>
       </div>
     </div>
   );

@@ -137,39 +137,47 @@ export default function AdminDashboardPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600 text-sm">Total Issues</p>
-            <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-md p-6 border-l-4 border-l-gray-600">
+            <p className="text-gray-600 text-sm font-semibold mb-1">📊 Total Issues</p>
+            <p className="text-4xl font-bold text-gray-900">{stats.total}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600 text-sm">Submitted</p>
-            <p className="text-3xl font-bold text-yellow-600">{stats.submitted}</p>
+          <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg shadow-md p-6 border-l-4 border-l-yellow-600">
+            <p className="text-yellow-700 text-sm font-semibold mb-1">🔔 Submitted</p>
+            <p className="text-4xl font-bold text-yellow-600">{stats.submitted}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600 text-sm">In Progress</p>
-            <p className="text-3xl font-bold text-blue-600">{stats.inProgress}</p>
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-md p-6 border-l-4 border-l-blue-600">
+            <p className="text-blue-700 text-sm font-semibold mb-1">⚙️ In Progress</p>
+            <p className="text-4xl font-bold text-blue-600">{stats.inProgress}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600 text-sm">Resolved</p>
-            <p className="text-3xl font-bold text-green-600">{stats.resolved}</p>
+          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-md p-6 border-l-4 border-l-green-600">
+            <p className="text-green-700 text-sm font-semibold mb-1">✅ Resolved</p>
+            <p className="text-4xl font-bold text-green-600">{stats.resolved}</p>
           </div>
         </div>
 
         {/* Filter */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Filter by Status
+        <div className="mb-8">
+          <label className="block text-sm font-semibold text-gray-900 mb-3">
+            🔍 Filter by Status
           </label>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          >
-            <option value="ALL">All Issues</option>
-            <option value="SUBMITTED">Submitted</option>
-            <option value="IN_PROGRESS">In Progress</option>
-            <option value="RESOLVED">Resolved</option>
-          </select>
+          <div className="flex gap-2 flex-wrap">
+            {["ALL", "SUBMITTED", "IN_PROGRESS", "RESOLVED"].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilterStatus(status)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  filterStatus === status
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "bg-white text-gray-700 border border-gray-300 hover:border-blue-500"
+                }`}
+              >
+                {status === "ALL" && "All Issues"}
+                {status === "SUBMITTED" && "🔔 Submitted"}
+                {status === "IN_PROGRESS" && "⚙️ In Progress"}
+                {status === "RESOLVED" && "✅ Resolved"}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Issues Table */}

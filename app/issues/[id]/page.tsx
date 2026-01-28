@@ -195,16 +195,16 @@ export default function IssueDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        <Link href="/issues" className="text-blue-600 hover:text-blue-800 mb-6">
+      <div className="max-w-3xl mx-auto">
+        <Link href="/issues" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-8 font-medium">
           ← Back to Issues
         </Link>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex justify-between items-start mb-4">
-            <h1 className="text-3xl font-bold text-gray-900">{issue.title}</h1>
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-8 border-l-4 border-l-blue-600">
+          <div className="flex justify-between items-start gap-4 mb-6">
+            <h1 className="text-4xl font-bold text-gray-900 flex-1">{issue.title}</h1>
             <span
-              className={`px-3 py-1 rounded text-sm font-medium ${getStatusColor(
+              className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap ${getStatusColor(
                 issue.status
               )}`}
             >
@@ -213,143 +213,166 @@ export default function IssueDetailPage() {
           </div>
 
           {error && (
-            <div className="mb-4 rounded-md bg-red-50 p-4">
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
+              <div className="flex items-center gap-2">
+                <span className="text-red-600 font-bold">⚠</span>
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
             </div>
           )}
 
-          <div className="mb-4 space-y-2">
-            <p className="text-sm text-gray-600">
-              <strong>Category:</strong> {issue.category}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Reported by:</strong> {issue.citizen.name} ({issue.citizen.email})
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Submitted:</strong>{" "}
-              {new Date(issue.createdAt).toLocaleString()}
-            </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 pb-8 border-b">
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Category</p>
+              <p className="text-lg font-semibold text-gray-900">{issue.category}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Reported by</p>
+              <p className="text-sm font-medium text-gray-900">{issue.citizen.name}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Date Submitted</p>
+              <p className="text-sm text-gray-600">{new Date(issue.createdAt).toLocaleDateString()}</p>
+            </div>
             {issue.respondedBy && (
-              <p className="text-sm text-gray-600">
-                <strong>Last updated by:</strong> {issue.respondedBy.name}
-              </p>
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Last Updated</p>
+                <p className="text-sm text-gray-600">{issue.respondedBy.name}</p>
+              </div>
             )}
           </div>
 
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              Description
-            </h2>
-            <p className="text-gray-700">{issue.description}</p>
+          <div className="mb-8">
+            <h2 className="text-lg font-bold text-gray-900 mb-3">Issue Details</h2>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{issue.description}</p>
           </div>
 
           {issue.adminResponse && (
-            <div className="mb-6 bg-blue-50 p-4 rounded">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">
-                Admin Response
+            <div className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg border-l-4 border-l-green-500">
+              <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span>💬</span> Official Response
               </h2>
-              <p className="text-gray-700">{issue.adminResponse}</p>
+              <p className="text-gray-700 leading-relaxed">{issue.adminResponse}</p>
             </div>
           )}
         </div>
 
         {/* Admin Status Update */}
         {isAdmin && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Update Issue Status
+          <div className="bg-white rounded-lg shadow-lg p-8 mb-8 border-l-4 border-l-purple-600">
+            <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <span>⚙️</span> Manage Issue Status
             </h2>
-            <form onSubmit={handleUpdateStatus} className="space-y-4">
+            <form onSubmit={handleUpdateStatus} className="space-y-6">
               <div>
                 <label
                   htmlFor="status"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
                 >
-                  Status
+                  Update Status *
                 </label>
                 <select
                   id="status"
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
                 >
-                  <option value="SUBMITTED">Submitted</option>
-                  <option value="IN_PROGRESS">In Progress</option>
-                  <option value="RESOLVED">Resolved</option>
+                  <option value="SUBMITTED">🔔 Submitted</option>
+                  <option value="IN_PROGRESS">⚙️ In Progress</option>
+                  <option value="RESOLVED">✅ Resolved</option>
                 </select>
               </div>
 
               <div>
                 <label
                   htmlFor="adminResponse"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
                 >
-                  Admin Response (Optional)
+                  Response to Citizen (Optional)
                 </label>
                 <textarea
                   id="adminResponse"
-                  rows={3}
-                  placeholder="Add a response or update for the citizen..."
+                  rows={4}
+                  placeholder="Share an update about this issue or what actions are being taken..."
                   value={adminResponse}
                   onChange={(e) => setAdminResponse(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  maxLength={500}
                 />
+                <p className="text-xs text-gray-500 mt-1">{adminResponse.length}/500</p>
               </div>
 
               <button
                 type="submit"
                 disabled={updatingStatus}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="w-full py-3 px-4 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
               >
-                {updatingStatus ? "Updating..." : "Update Status"}
+                {updatingStatus ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="animate-spin">⚙️</span>
+                    Updating...
+                  </span>
+                ) : (
+                  "Update Status"
+                )}
               </button>
             </form>
           </div>
         )}
 
         {/* Comments Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Comments</h2>
+        <div className="bg-white rounded-lg shadow-lg p-8 border-l-4 border-l-green-600">
+          <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <span>💬</span> Updates & Comments
+          </h2>
 
           {/* Add Comment */}
-          <form onSubmit={handleAddComment} className="mb-6">
+          <form onSubmit={handleAddComment} className="mb-8 pb-8 border-b">
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add a comment..."
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm mb-2"
+              placeholder="Add a comment or update..."
+              rows={4}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none mb-3"
+              maxLength={500}
             />
-            <button
-              type="submit"
-              disabled={submittingComment || !newComment.trim()}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-            >
-              {submittingComment ? "Posting..." : "Post Comment"}
-            </button>
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-gray-500">{newComment.length}/500</p>
+              <button
+                type="submit"
+                disabled={submittingComment || !newComment.trim()}
+                className="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {submittingComment ? "Posting..." : "Post Comment"}
+              </button>
+            </div>
           </form>
 
           {/* Display Comments */}
           {issue.comments.length === 0 ? (
-            <p className="text-gray-500">No comments yet</p>
+            <div className="text-center py-8">
+              <p className="text-gray-500">No updates or comments yet</p>
+            </div>
           ) : (
             <div className="space-y-4">
               {issue.comments.map((comment) => (
-                <div key={comment.id} className="border-l-4 border-gray-300 pl-4 py-2">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-medium text-gray-900">
-                      {comment.author.name}
+                <div key={comment.id} className="bg-gray-50 rounded-lg p-4 border-l-4 border-l-gray-300 hover:bg-gray-100 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-gray-900">
+                        {comment.author.name}
+                      </span>
                       {comment.author.role === "ADMIN" && (
-                        <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                          Admin
+                        <span className="text-xs bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-semibold">
+                          🔑 Admin
                         </span>
                       )}
-                    </span>
+                    </div>
                     <span className="text-xs text-gray-500">
                       {new Date(comment.createdAt).toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-gray-700">{comment.content}</p>
+                  <p className="text-gray-700 leading-relaxed">{comment.content}</p>
                 </div>
               ))}
             </div>

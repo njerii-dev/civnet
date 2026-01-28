@@ -120,13 +120,16 @@ export default function IssuesPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">Reported Issues</h2>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Reported Issues</h2>
+            <p className="text-gray-600 mt-1">{issues.length} issues in total</p>
+          </div>
           <Link
             href="/issues/report"
-            className="px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700"
+            className="px-6 py-3 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors shadow-md hover:shadow-lg whitespace-nowrap"
           >
-            + Report Issue
+            + Report New Issue
           </Link>
         </div>
 
@@ -150,28 +153,30 @@ export default function IssuesPage() {
           <div className="grid gap-4">
             {issues.map((issue) => (
               <Link key={issue.id} href={`/issues/${issue.id}`}>
-                <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer p-6">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {issue.title}
-                    </h3>
+                <div className="bg-white rounded-lg shadow hover:shadow-lg transition-all duration-200 cursor-pointer p-6 border-l-4 border-l-blue-500 hover:border-l-blue-600">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+                        {issue.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Category: <span className="font-medium">{issue.category}</span>
+                      </p>
+                    </div>
                     <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                      className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ml-2 ${getStatusColor(
                         issue.status
                       )}`}
                     >
                       {issue.status}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Category: <span className="font-medium">{issue.category}</span>
-                  </p>
-                  <p className="text-sm text-gray-700 mb-3 line-clamp-2">
+                  <p className="text-sm text-gray-700 mb-4 line-clamp-2">
                     {issue.description}
                   </p>
                   <div className="flex justify-between text-xs text-gray-500">
-                    <span>By: {issue.citizen.name}</span>
-                    <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
+                    <span>📍 By: {issue.citizen.name}</span>
+                    <span>📅 {new Date(issue.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               </Link>
