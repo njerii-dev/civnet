@@ -1,71 +1,67 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
-export default function Home() {
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/auth/me");
-        const data = await res.json();
-        
-        if (data.authenticated) {
-          // Redirect to dashboard if authenticated
-          router.push("/dashboard");
-        } else {
-          setIsLoading(false);
-        }
-      } catch (err) {
-        setIsLoading(false);
-      }
-    };
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-    checkAuth();
-  }, [router]);
+    // This calls the API Copilot likely started for you
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+      headers: { "Content-Type": "application/json" },
+    });
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    );
-  }
+    if (res.ok) {
+      router.push("/dashboard"); // Take them to the app!
+      router.refresh(); // Refresh the layout to show the Sidebar
+    } else {
+      setError("Invalid email or password. Please try again.");
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
-      <main className="text-center max-w-2xl">
-        <div className="mb-8">
-          <h1 className="text-5xl font-bold text-gray-900 mb-2">Civnet</h1>
-          <div className="text-4xl text-green-600 font-semibold">C</div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl">
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold text-blue-900">Welcome back</h2>
+          <p className="mt-2 text-sm text-gray-600">Sign in to your Civnet account</p>
         </div>
-
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          Welcome to Civnet
-        </h2>
-        <p className="text-lg text-gray-600 mb-12">
-          Help your community by reporting local issues and staying informed about what's happening in your area.
-        </p>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            href="/signup"
-            className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
-          >
-            Create Account
-          </Link>
-          <Link
-            href="/login"
-            className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg border-2 border-blue-600 hover:bg-blue-50 transition-colors shadow-lg"
+        {error && <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">{error}</p>}
+
+        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+          <div className="space-y-4">
+            <input
+              type="email"
+              placeholder="Email address"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
           >
             Sign In
-          </Link>
-        </div>
-      </main>
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
