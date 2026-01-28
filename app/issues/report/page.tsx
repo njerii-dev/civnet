@@ -197,8 +197,8 @@ export default function ReportIssuePage() {
         <p className="text-xs text-gray-500 text-center mt-6">
           Your issue will be reviewed by city officials. You'll receive updates on its status.
         </p>
+        </div>
       </div>
-    </div>
       )}
     </>
   );
