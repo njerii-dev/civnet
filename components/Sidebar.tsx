@@ -1,120 +1,61 @@
 "use client";
-
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
 
-interface SidebarProps {
-  user?: any;
-}
-
-export default function Sidebar({ user }: SidebarProps) {
-  const router = useRouter();
+export default function Sidebar({ user }: { user: any }) {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
 
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-  };
-
-  const navItems = [
-    { label: "Dashboard", href: "/dashboard", icon: "📊" },
-    { label: "Report Issue", href: "/issues/report", icon: "📝" },
-    { label: "My Reports", href: "/dashboard", icon: "📋" },
+  // Define navigation based on user role
+  const citizenLinks = [
+    { name: "Dashboard", href: "/dashboard", icon: "🏠" },
+    { name: "Report Issue", href: "/report", icon: "📢" },
+    { name: "My Reports", href: "/my-reports", icon: "📋" },
   ];
 
-  if (user?.role === "ADMIN") {
-    navItems.push({ label: "Admin View (For Admins)", href: "/admin/dashboard", icon: "⚙️" });
-  }
+  const adminLinks = [
+    { name: "Admin Overview", href: "/admin", icon: "🏛️" },
+    { name: "Manage Issues", href: "/admin/manage", icon: "🛠️" },
+    { name: "User Stats", href: "/admin/stats", icon: "📊" },
+  ];
 
-  navItems.push({ label: "Profile", href: "/profile", icon: "👤" });
-
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+  const links = user?.role === "ADMIN" ? adminLinks : citizenLinks;
 
   return (
-    <>
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden bg-blue-600 text-white p-2 rounded-lg shadow-lg"
-      >
-        ☰
-      </button>
+    <aside className="w-64 min-h-screen bg-white border-r border-gray-200 p-4">
+      <div className="mb-8 p-2">
+        <h1 className="text-2xl font-bold text-blue-600">Civnet</h1>
+        <p className="text-xs text-gray-400 capitalize">{user?.role} Portal</p>
+      </div>
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed left-0 top-0 h-screen w-72 bg-gradient-to-b from-blue-50 to-white shadow-2xl transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        } md:relative md:translate-x-0 z-40 border-r border-gray-200`}
-      >
-        {/* Logo Section */}
-        <div className="p-6 border-b-2 border-blue-100 bg-white">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">C</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-gray-900 text-lg">Civnet</span>
-              <span className="text-xs text-gray-500 font-medium">Community Issues</span>
-            </div>
-          </Link>
-        </div>
-
-        {/* User Info */}
-        <div className="p-6 border-b-2 border-blue-100 bg-gradient-to-r from-blue-50 to-white">
-          <p className="text-sm font-bold text-gray-900">Welcome, {user?.name || "User"}!</p>
-          <p className="text-xs text-gray-500 mt-2 break-all">{user?.email}</p>
-        </div>
-
-        {/* Report New Issue Button */}
-        <div className="p-6 border-b-2 border-blue-100 bg-white">
+      <nav className="space-y-1">
+        {links.map((link) => (
           <Link
-            href="/issues/report"
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transform hover:scale-105"
-            onClick={() => setIsOpen(false)}
+            key={link.href}
+            href={link.href}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+              pathname === link.href 
+                ? "bg-blue-50 text-blue-600 font-medium" 
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
           >
-            <span className="text-xl">+</span> Report New Issue
+            <span>{link.icon}</span>
+            {link.name}
           </Link>
+        ))}
+      </nav>
+
+      {/* User Profile Summary at bottom */}
+      <div className="absolute bottom-0 left-0 w-full p-4 border-t border-gray-100">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+            {user?.name?.charAt(0) || "U"}
+          </div>
+          <div className="overflow-hidden">
+            <p className="text-sm font-medium truncate">{user?.name}</p>
+            <button className="text-xs text-red-500 hover:underline">Log out</button>
+          </div>
         </div>
-
-        {/* Navigation Items */}
-        <nav className="p-4 space-y-2 flex-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`block px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-3 font-medium ${
-                isActive(item.href)
-                  ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
-                  : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-              }`}
-              onClick={() => setIsOpen(false)}
-            >
-              <span className="text-xl">{item.icon}</span>
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
-
-        {/* Logout Button */}
-        <div className="p-4 border-t-2 border-blue-100 bg-white">
-          <button
-            onClick={handleLogout}
-            className="w-full px-4 py-3 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors border border-red-200"
-          >
-            Logout
-          </button>
-        </div>
-      </aside>
-
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 md:hidden z-30 backdrop-blur-sm"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-    </>
+      </div>
+    </aside>
   );
 }
