@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { Prisma } from "@prisma/client";
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "User already exists" },
+        { error: "A user with this email already exists" },
         { status: 409 }
       );
     }
@@ -49,10 +50,21 @@ export async function POST(request: NextRequest) {
       { message: "User created successfully", user },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Signup error:", error);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        // Unique constraint failed on the fields: (`email`)
+        return NextResponse.json(
+          { error: "A user with this email already exists" },
+          { status: 409 }
+        );
+      }
+    }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error while creating account" },
       { status: 500 }
     );
   }

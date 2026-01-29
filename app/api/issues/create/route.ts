@@ -58,10 +58,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Create issue error:", error);
     return NextResponse.json(
-      { error: "Failed to create issue" },
+      { error: "Internal server error while creating issue" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

@@ -107,7 +107,5 @@ export async function GET(
       { error: "Failed to fetch comments" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { Prisma } from "@prisma/client";
 
 const JWT_SECRET =
   process.env.JWT_SECRET ??
@@ -75,10 +76,21 @@ export async function POST(request: NextRequest) {
     });
 
     return response;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Login error:", error);
+
+    if (error instanceof Prisma.PrismaClientInitializationError) {
+      return NextResponse.json(
+        {
+          error:
+            "Cannot connect to the database. Check DATABASE_URL and that the database is reachable.",
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error while logging in" },
       { status: 500 }
     );
   }
