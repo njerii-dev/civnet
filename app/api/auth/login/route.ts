@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+
+const JWT_SECRET =
+  process.env.JWT_SECRET ??
+  (process.env.NODE_ENV === "production"
+    ? (() => {
+        throw new Error("JWT_SECRET is required in production");
+      })()
+    : "your-secret-key");
 
 export async function POST(request: NextRequest) {
   try {

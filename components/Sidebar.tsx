@@ -13,9 +13,9 @@ export default function Sidebar({ user }: { user: any }) {
   ];
 
   const adminLinks = [
-    { name: "Admin Overview", href: "/admin", icon: "🏛️" },
-    { name: "Manage Issues", href: "/admin/manage", icon: "🛠️" },
-    { name: "User Stats", href: "/admin/stats", icon: "📊" },
+    { name: "Admin Dashboard", href: "/admin/dashboard", icon: "🏛️" },
+    { name: "All Issues", href: "/issues", icon: "🧾" },
+    { name: "Enhanced View", href: "/admin/dashboard-enhanced", icon: "📊" },
   ];
 
   const links = user?.role === "ADMIN" ? adminLinks : citizenLinks;
@@ -44,7 +44,6 @@ export default function Sidebar({ user }: { user: any }) {
         ))}
       </nav>
 
-      {/* User Profile Summary at bottom */}
       <div className="absolute bottom-0 left-0 w-full p-4 border-t border-gray-100">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
@@ -52,7 +51,14 @@ export default function Sidebar({ user }: { user: any }) {
           </div>
           <div className="overflow-hidden">
             <p className="text-sm font-medium truncate">{user?.name}</p>
-            <button className="text-xs text-red-500 hover:underline">Log out</button>
+            <form action="/api/auth/logout" method="post">
+              <button
+                type="submit"
+                className="text-xs text-red-500 hover:underline"
+              >
+                Log out
+              </button>
+            </form>
           </div>
         </div>
       </div>

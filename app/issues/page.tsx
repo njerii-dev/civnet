@@ -100,6 +100,12 @@ export default function IssuesPage() {
     );
   }
 
+  // Sort newest first to match brief
+  const sortedIssues = [...issues].sort(
+    (a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-16 md:pt-0">
       {/* Header */}
@@ -107,10 +113,10 @@ export default function IssuesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard - Reported Issues</h1>
+              <h1 className="text-3xl font-bold text-gray-900">All Community Issues</h1>
             </div>
             <Link
-              href="/issues/report"
+              href="/report"
               className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
             >
               <span className="text-xl">+</span> Report New Issue
@@ -127,7 +133,7 @@ export default function IssuesPage() {
           </div>
         )}
 
-        {issues.length === 0 ? (
+                {sortedIssues.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl shadow-sm">
             <p className="text-gray-600 mb-4 text-lg font-medium">No issues reported yet</p>
             <Link href="/issues/report" className="text-green-600 hover:text-green-700 font-semibold">
@@ -149,7 +155,7 @@ export default function IssuesPage() {
 
               {/* Table Body */}
               <div className="divide-y divide-gray-200">
-                {issues.map((issue) => {
+                {sortedIssues.map((issue) => {
                   const statusColor = getStatusColor(issue.status);
                   const categoryColor = getCategoryColor(issue.category);
                   const daysAgo = Math.floor((Date.now() - new Date(issue.createdAt).getTime()) / (1000 * 60 * 60 * 24));
