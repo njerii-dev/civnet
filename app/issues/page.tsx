@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Sidebar from "@/components/Sidebar";
 
 interface Issue {
   id: string;
@@ -89,15 +90,20 @@ export default function IssuesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block">
-            <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
-          </div>
-          <p className="text-slate-600 mt-4 text-sm font-medium">
-            Loading reported issues...
-          </p>
+      <div className="flex min-h-screen bg-slate-50">
+        <div className="hidden md:block">
+          <Sidebar user={null} />
         </div>
+        <main className="flex-1 flex items-center justify-center px-4">
+          <div className="text-center">
+            <div className="inline-block">
+              <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
+            </div>
+            <p className="text-slate-600 mt-4 text-sm font-medium">
+              Loading reported issues...
+            </p>
+          </div>
+        </main>
       </div>
     );
   }
@@ -109,30 +115,35 @@ export default function IssuesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              Dashboard
-            </p>
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-              Dashboard – Reported Issues
-            </h1>
-          </div>
-          <Link
-            href="/report"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-700 transition-colors"
-          >
-            <span className="text-lg leading-none">+</span>
-            <span>Report New Issue</span>
-          </Link>
-        </div>
-      </header>
+    <div className="flex min-h-screen bg-slate-50">
+      <div className="hidden md:block">
+        <Sidebar user={user} />
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <main className="flex-1 md:ml-64">
+        {/* Header */}
+        <header className="bg-white border-b border-slate-200">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                Dashboard
+              </p>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+                Dashboard – Reported Issues
+              </h1>
+            </div>
+            <Link
+              href="/report"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-700 transition-colors"
+            >
+              <span className="text-lg leading-none">+</span>
+              <span>Report New Issue</span>
+            </Link>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {error && (
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             ⚠ {error}
@@ -253,6 +264,7 @@ export default function IssuesPage() {
             </Link>
           </div>
         )}
+        </div>
       </main>
     </div>
   );
