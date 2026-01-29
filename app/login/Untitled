@@ -1,0 +1,13 @@
+import { handleLogin } from "../actions"; 
+
+export default function LoginPage() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+      <h1 className="text-2xl font-bold mb-4">Login</h1>
+      <form action={handleLogin} className="flex flex-col gap-4">
+        <input name="email" type="email" placeholder="Email" className="border p-2 rounded text-black" required />
+        <button type="submit" className="bg-blue-500 text-white p-2 rounded">Sign In</button>
+      </form>
+    </main>
+  );
+}
