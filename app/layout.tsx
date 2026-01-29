@@ -1,62 +1,26 @@
-"use client";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css"; // THIS IS THE MOST IMPORTANT LINE
 
-import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
+const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+export const metadata: Metadata = {
+  title: "Civnet | Community Issue Tracker",
+  description: "Improve your community, one report at a time.",
+};
 
-  const publicPages = ["/login", "/signup", "/"];
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/auth/me");
-        const data = await res.json();
-
-        if (data.authenticated) {
-          setUser(data.user);
-        } else if (!publicPages.includes(pathname)) {
-          router.push("/login");
-        }
-      } catch (err) {
-        if (!publicPages.includes(pathname)) {
-          router.push("/login");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [pathname, router]);
-
-  const isPublicPage = publicPages.includes(pathname);
-  const showSidebar = !isPublicPage && user;
-
-  if (loading && !isPublicPage) {
-    return (
-      <html lang="en">
-        <body className="bg-gray-50">
-          <div className="flex min-h-screen items-center justify-center">
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        </body>
-      </html>
-    );
-  }
-
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body className="bg-gray-50">
-        <div className="flex">
-          {showSidebar && <Sidebar user={user} />}
-          <main className="flex-1">{children}</main>
-        </div>
+      <body className={`${inter.className} bg-slate-50 text-slate-900 antialiased`}>
+        {/* This main tag ensures your content is positioned correctly */}
+        <main className="min-h-screen">
+          {children}
+        </main>
       </body>
     </html>
   );
