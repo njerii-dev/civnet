@@ -89,12 +89,14 @@ export default function IssuesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center pt-16 md:pt-0">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block">
-            <div className="w-12 h-12 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin"></div>
+            <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
           </div>
-          <p className="text-gray-600 mt-4 font-medium">Loading issues...</p>
+          <p className="text-slate-600 mt-4 text-sm font-medium">
+            Loading reported issues...
+          </p>
         </div>
       </div>
     );
@@ -107,148 +109,149 @@ export default function IssuesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-16 md:pt-0">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">All Community Issues</h1>
-            </div>
-            <Link
-              href="/report"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-            >
-              <span className="text-xl">+</span> Report New Issue
-            </Link>
+      <header className="bg-white border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              Dashboard
+            </p>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+              Dashboard – Reported Issues
+            </h1>
           </div>
+          <Link
+            href="/report"
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-700 transition-colors"
+          >
+            <span className="text-lg leading-none">+</span>
+            <span>Report New Issue</span>
+          </Link>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
-            <p className="text-red-700 font-medium">⚠️ {error}</p>
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            ⚠ {error}
           </div>
         )}
 
-                {sortedIssues.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl shadow-sm">
-            <p className="text-gray-600 mb-4 text-lg font-medium">No issues reported yet</p>
-            <Link href="/issues/report" className="text-green-600 hover:text-green-700 font-semibold">
-              Be the first to report an issue →
+        {sortedIssues.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
+            <p className="text-sm text-slate-600 mb-3">
+              No issues have been reported yet.
+            </p>
+            <Link
+              href="/report"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-colors"
+            >
+              Be the first to report an issue
             </Link>
           </div>
         ) : (
-          <>
-            {/* Issues Table */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
-              {/* Table Header */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 font-semibold text-gray-700 text-sm">
-                <div>Title</div>
-                <div>Category</div>
-                <div>Status</div>
-                <div>Status</div>
-                <div className="text-right">Last Updated</div>
-              </div>
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="hidden md:grid grid-cols-[2fr,1fr,1fr,1fr] gap-4 px-6 py-3 border-b border-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span>Title</span>
+              <span>Category</span>
+              <span>Status</span>
+              <span className="text-right">Last Updated</span>
+            </div>
 
-              {/* Table Body */}
-              <div className="divide-y divide-gray-200">
-                {sortedIssues.map((issue) => {
-                  const statusColor = getStatusColor(issue.status);
-                  const categoryColor = getCategoryColor(issue.category);
-                  const daysAgo = Math.floor((Date.now() - new Date(issue.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+            <div className="divide-y divide-slate-100">
+              {sortedIssues.map((issue) => {
+                const statusColor = getStatusColor(issue.status);
+                const categoryColor = getCategoryColor(issue.category);
+                const daysAgo = Math.floor(
+                  (Date.now() - new Date(issue.createdAt).getTime()) /
+                    (1000 * 60 * 60 * 24)
+                );
 
-                  return (
-                    <Link key={issue.id} href={`/issues/${issue.id}`}>
-                      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 px-6 py-4 hover:bg-blue-50 transition-colors duration-150 cursor-pointer items-center border-l-4 border-transparent hover:border-blue-500">
-                        {/* Title */}
+                return (
+                  <Link key={issue.id} href={`/issues/${issue.id}`}>
+                    <div className="px-4 sm:px-6 py-4 hover:bg-slate-50 transition-colors cursor-pointer">
+                      <div className="grid gap-3 md:grid-cols-[2fr,1fr,1fr,1fr] md:items-center">
+                        {/* Title + citizen */}
                         <div className="min-w-0">
-                          <p className="font-semibold text-gray-900 text-sm truncate">{issue.title}</p>
-                          <p className="text-xs text-gray-500 mt-1 line-clamp-1">{issue.category}</p>
+                          <p className="text-sm font-semibold text-slate-900 truncate">
+                            {issue.title}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500 line-clamp-1">
+                            {issue.citizen?.name} • {issue.citizen?.email}
+                          </p>
                         </div>
 
-                        {/* Category Badge */}
-                        <div>
+                        {/* Category pill */}
+                        <div className="flex items-center">
                           <span
-                            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium"
+                            className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium"
                             style={{
                               backgroundColor: categoryColor.bg,
                               color: categoryColor.text,
                             }}
                           >
                             {categoryColor.icon}
+                            <span className="hidden sm:inline">
+                              {issue.category}
+                            </span>
                           </span>
                         </div>
 
-                        {/* Status Badge */}
-                        <div>
+                        {/* Status pill */}
+                        <div className="flex items-center">
                           <span
-                            className="inline-flex px-3 py-2 rounded-lg text-sm font-semibold"
+                            className="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
                             style={{
                               backgroundColor: statusColor.bg,
                               color: statusColor.text,
                             }}
                           >
-                            {issue.status}
+                            {issue.status === "SUBMITTED" && "Submitted"}
+                            {issue.status === "IN_PROGRESS" && "In Progress"}
+                            {issue.status === "RESOLVED" && "Resolved"}
+                            {!["SUBMITTED", "IN_PROGRESS", "RESOLVED"].includes(
+                              issue.status
+                            ) && issue.status}
                           </span>
                         </div>
 
-                        {/* Action */}
-                        <div>
-                          {issue.status === "SUBMITTED" && (
-                            <span className="inline-flex text-center px-3 py-2 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700">
-                              Change Status
-                            </span>
-                          )}
-                          {issue.status === "IN_PROGRESS" && (
-                            <span className="inline-flex text-center px-3 py-2 text-xs font-semibold rounded-lg bg-yellow-50 text-yellow-700">
-                              Add Comment
-                            </span>
-                          )}
-                          {issue.status === "RESOLVED" && (
-                            <span className="inline-flex text-center px-3 py-2 text-xs font-semibold rounded-lg bg-green-50 text-green-700">
-                              Resolved
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Date */}
-                        <div className="text-right">
-                          <p className="text-sm text-gray-600 font-medium">
-                            {daysAgo === 0 ? "Today" : daysAgo === 1 ? "Yesterday" : `${daysAgo} days ago`}
-                          </p>
+                        {/* Last updated */}
+                        <div className="text-right text-xs text-slate-600">
+                          {daysAgo === 0
+                            ? "Today"
+                            : daysAgo === 1
+                            ? "Yesterday"
+                            : `${daysAgo} days ago`}
                         </div>
                       </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Admin Section */}
-            {user?.role === "ADMIN" && (
-              <div className="mt-8">
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-6 border-b border-blue-100">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                      <div>
-                        <h2 className="text-xl font-bold text-gray-900">Admin View</h2>
-                        <p className="text-gray-600 text-sm mt-1">Official Response: Crew dispatched, Issue resolved</p>
-                      </div>
-                      <Link
-                        href="/admin/dashboard"
-                        className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap text-sm"
-                      >
-                        Actions
-                      </Link>
                     </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {user?.role === "ADMIN" && (
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-6 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                Admin view
+              </p>
+              <p className="text-sm text-slate-700">
+                Switch to the admin dashboard to change statuses and add
+                official responses.
+              </p>
+            </div>
+            <Link
+              href="/admin/dashboard"
+              className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors"
+            >
+              Go to Admin Dashboard
+            </Link>
+          </div>
         )}
       </main>
     </div>
