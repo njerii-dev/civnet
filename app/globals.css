@@ -1,8 +1,0 @@
-@import "tailwindcss";
-
-/* This replaces your old config file */
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui;
-  --color-brand: #3b82f6;
-  /* Add your custom colors and fonts here */
-}
