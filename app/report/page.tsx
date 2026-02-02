@@ -1,4 +1,4 @@
-import { createIssue } from "@/actions/issueActions";
+import { createIssue } from "@/app/actions/issueActions";
 
 export default function ReportPage() {
   return (
