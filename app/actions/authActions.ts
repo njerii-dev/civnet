@@ -20,12 +20,12 @@ export async function login(formData: FormData) {
         if (error instanceof AuthError) {
             switch (error.type) {
                 case "CredentialsSignin":
-                    // Redirect back with error
-                    redirect("/auth/login?error=CredentialsSignin");
+                    return redirect("/auth/login?error=CredentialsSignin");
                 default:
-                    redirect("/auth/login?error=SomethingWentWrong");
+                    return redirect("/auth/login?error=SomethingWentWrong");
             }
         }
+        // IMPORTANT: Re-throw the error so Next.js can handle the redirect
         throw error;
     }
 }
