@@ -49,3 +49,55 @@ export async function createIssue(formData: FormData) {
   // 5. Final Redirect (Must be outside try/catch)
   redirect("/dashboard/citizens");
 }
+
+export async function getAllIssues() {
+  const session = await auth();
+  if (session?.user?.role !== "admin") {
+    throw new Error("Unauthorized access.");
+  }
+
+  try {
+    return await db.issue.findMany({
+      include: {
+        citizen: {
+          select: {
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching issues:", error);
+    return [];
+  }
+}
+
+export async function updateIssueStatus(formData: FormData) {
+  const session = await auth();
+  if (session?.user?.role !== "admin") {
+    throw new Error("Unauthorized access.");
+  }
+
+  const issueId = parseInt(formData.get("issueId") as string);
+  const status = formData.get("status") as string;
+  const adminComment = formData.get("adminComment") as string;
+
+  try {
+    await db.issue.update({
+      where: { id: issueId },
+      data: {
+        status,
+        adminComment,
+      },
+    });
+
+    revalidatePath("/dashboard/admin");
+  } catch (error) {
+    console.error("Error updating issue:", error);
+    throw new Error("Failed to update issue.");
+  }
+}
