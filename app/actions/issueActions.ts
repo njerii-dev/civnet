@@ -10,7 +10,7 @@ export async function createIssue(formData: FormData) {
   const category = formData.get("category") as string;
 
   await db.issue.create({
-    data: { title, description, category }
+    data: { title, description, category: category as any }
   });
 
   revalidatePath("/dashboard/citizens");
