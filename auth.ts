@@ -14,6 +14,7 @@ export const {
     ...authConfig,
     adapter: PrismaAdapter(db),
     session: { strategy: "jwt" },
+    secret: process.env.AUTH_SECRET,
     providers: [
         Credentials({
             async authorize(credentials) {

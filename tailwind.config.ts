@@ -8,6 +8,17 @@ const config: Config = {
     ],
     theme: {
         extend: {
+            colors: {
+                brand: {
+                    primary: "#0D4F81",
+                    accent: "#EC268F",
+                    focus: "#EC268F",
+                },
+                neutral: {
+                    50: "#F8FAFC",
+                    100: "#F1F5F9",
+                }
+            },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
                 "gradient-conic":
@@ -18,3 +29,4 @@ const config: Config = {
     plugins: [],
 };
 export default config;
+
