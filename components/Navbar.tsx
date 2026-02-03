@@ -9,7 +9,7 @@ export default function Navbar() {
         <span>Civnet</span>
       </Link>
       <div className="flex gap-6 text-sm font-medium">
-        <Link href="/dashboard/citizen" className="hover:text-blue-600">My Reports</Link>
+        <Link href="/dashboard/citizens" className="hover:text-blue-600">My Reports</Link>
         <Link href="/report" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
           New Report
         </Link>
