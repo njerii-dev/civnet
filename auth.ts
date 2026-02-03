@@ -21,17 +21,29 @@ export const {
             async authorize(credentials) {
                 const { email, password } = credentials;
 
-                if (!email || !password) return null;
+                console.log("🔐 Auth attempt for:", email);
+
+                if (!email || !password) {
+                    console.log("❌ Missing email or password");
+                    return null;
+                }
 
                 const user = await db.user.findUnique({
                     where: { email: email as string },
                 });
 
-                if (!user || !user.password) return null;
+                console.log("👤 User found:", user ? `Yes (${user.email}, role: ${user.role})` : "No");
+
+                if (!user || !user.password) {
+                    console.log("❌ User not found or no password set");
+                    return null;
+                }
 
                 const passwordsMatch = await bcrypt.compare(password as string, user.password);
+                console.log("🔑 Password match:", passwordsMatch);
 
                 if (passwordsMatch) {
+                    console.log("✅ Login successful for:", user.email);
                     return {
                         id: user.id.toString(),
                         email: user.email,
@@ -40,6 +52,7 @@ export const {
                     };
                 }
 
+                console.log("❌ Password mismatch");
                 return null;
             },
         }),
