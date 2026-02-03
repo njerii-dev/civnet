@@ -13,6 +13,6 @@ export async function createIssue(formData: FormData) {
     data: { title, description, category }
   });
 
-  revalidatePath("/dashboard/citizen");
-  redirect("/dashboard/citizen");
+  revalidatePath("/dashboard/citizens");
+  redirect("/dashboard/citizens");
 }
