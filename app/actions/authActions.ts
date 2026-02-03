@@ -11,10 +11,22 @@ export async function login(formData: FormData) {
     const password = formData.get("password") as string;
 
     try {
+        // Check user role before signing in to determine redirect
+        const user = await db.user.findUnique({
+            where: { email },
+            select: { role: true }
+        });
+
+        // Determine redirect based on role
+        let redirectTo = "/dashboard/citizens";
+        if (user?.role === "admin" || user?.role === "system_admin") {
+            redirectTo = "/dashboard/admin";
+        }
+
         await signIn("credentials", {
             email,
             password,
-            redirectTo: "/dashboard/citizens",
+            redirectTo,
         });
     } catch (error) {
         if (error instanceof AuthError) {

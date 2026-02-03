@@ -7,15 +7,17 @@ import {
     Clock,
     AlertCircle,
     Users,
-    Filter
+    Filter,
+    Crown
 } from "lucide-react";
 import IssueTable from "./IssueTable";
 
 export default async function AdminPage() {
     const session = await auth();
 
-    // Basic RBAC check
-    if (!session || (session.user as any)?.role !== "admin") {
+    // RBAC check - allow both admin and system_admin
+    const userRole = (session?.user as any)?.role;
+    if (!session || (userRole !== "admin" && userRole !== "system_admin")) {
         redirect("/dashboard");
     }
 
@@ -40,9 +42,20 @@ export default async function AdminPage() {
                             Overseeing CivNet's infrastructure and community reports.
                         </p>
                     </div>
-                    <div className="flex items-center gap-2 bg-neutral-100 px-4 py-2 rounded-full border border-neutral-200">
-                        <Users className="w-5 h-5 text-neutral-600" />
-                        <span className="text-sm font-medium text-neutral-700">Administrator View</span>
+                    <div className="flex items-center gap-3">
+                        {userRole === "system_admin" && (
+                            <a
+                                href="/dashboard/system-admin"
+                                className="flex items-center gap-2 bg-gradient-to-r from-purple-100 to-indigo-100 px-4 py-2 rounded-full border border-purple-200 hover:from-purple-200 hover:to-indigo-200 transition-all"
+                            >
+                                <Crown className="w-5 h-5 text-purple-600" />
+                                <span className="text-sm font-medium text-purple-700">System Admin</span>
+                            </a>
+                        )}
+                        <div className="flex items-center gap-2 bg-neutral-100 px-4 py-2 rounded-full border border-neutral-200">
+                            <Users className="w-5 h-5 text-neutral-600" />
+                            <span className="text-sm font-medium text-neutral-700">Administrator View</span>
+                        </div>
                     </div>
                 </div>
 

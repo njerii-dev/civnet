@@ -52,7 +52,10 @@ export async function createIssue(formData: FormData) {
 
 export async function getAllIssues() {
   const session = await auth();
-  if (session?.user?.role !== "admin") {
+  const userRole = session?.user?.role;
+
+  // Allow both admin and system_admin roles
+  if (userRole !== "admin" && userRole !== "system_admin") {
     throw new Error("Unauthorized access.");
   }
 
@@ -78,7 +81,10 @@ export async function getAllIssues() {
 
 export async function updateIssueStatus(formData: FormData) {
   const session = await auth();
-  if (session?.user?.role !== "admin") {
+  const userRole = session?.user?.role;
+
+  // Allow both admin and system_admin roles
+  if (userRole !== "admin" && userRole !== "system_admin") {
     throw new Error("Unauthorized access.");
   }
 
