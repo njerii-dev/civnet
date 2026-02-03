@@ -15,6 +15,9 @@ model Issue {
   status       String?   @default("submitted")
   adminComment String?   @map("admin_comment")
   createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  
+  citizenId    Int?      @map("citizen_id")
+  citizen      User?     @relation(fields: [citizenId], references: [id])
 
   @@map("issues")
 }
@@ -22,9 +25,12 @@ model Issue {
 model User {
   id        Int       @id @default(autoincrement())
   email     String    @unique
+  password  String?
   role      String?   @default("citizen")
   createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   fullName  String?   @map("full_name")
+  
+  issues    Issue[]
 
   @@map("users")
 }

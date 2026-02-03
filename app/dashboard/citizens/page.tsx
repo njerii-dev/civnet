@@ -1,8 +1,21 @@
 import { db } from "@/lib/db";
 import { Clock, MessageSquare, Tag } from "lucide-react";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 export default async function CitizenDashboard() {
-  const issues = await db.issue.findMany({ orderBy: { createdAt: 'desc' } });
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/auth/login");
+  }
+
+  const isCitizen = (session.user as any).role === 'citizen';
+
+  const issues = await db.issue.findMany({
+    where: isCitizen ? { citizenId: parseInt((session.user as any).id) } : {},
+    orderBy: { createdAt: 'desc' }
+  });
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
@@ -28,8 +41,8 @@ export default async function CitizenDashboard() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${issue.status === 'resolved' ? 'bg-green-100 text-green-700' :
-                        issue.status === 'in progress' ? 'bg-amber-100 text-amber-700' :
-                          'bg-blue-100 text-blue-700'
+                      issue.status === 'in progress' ? 'bg-amber-100 text-amber-700' :
+                        'bg-blue-100 text-blue-700'
                       }`}>
                       {issue.status}
                     </span>
