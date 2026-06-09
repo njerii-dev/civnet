@@ -27,7 +27,8 @@ I designed and developed the frontend application, implementing responsive layou
 
 https://civnet-rose.vercel.app/
 
-## 📸 Screenshots
+## <img width="1289" height="614" alt="civnethomepage" src="https://github.com/user-attachments/assets/f53b7bf3-d834-4e35-ac9e-792b3ddd6d05" />
+
 
 (Add screenshots here)
 
